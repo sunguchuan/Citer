@@ -9,7 +9,6 @@ from uuid import uuid4
 import requests
 from flask import Flask, jsonify, request
 
-import rsa
 import cryptography
 
 from cryptography.hazmat.backends import default_backend
@@ -21,8 +20,6 @@ import base64
 
 from cryptography.exceptions import InvalidSignature
 
-import imagehash
-
 import _thread
 
 class Authority:
@@ -30,10 +27,6 @@ class Authority:
         self.retrived_data=None
         self.govData=self.getFileData('govpub.pem')
         self.users=0
-        # self.govPubkey=serialization.load_pem_public_key(
-        #     self.govData,
-        #     backend=default_backend()
-        # )
 
     def getFileData(self,filename):
         input=open(filename,'rb')
@@ -68,9 +61,6 @@ class Authority:
 
         signature_string=base64.b64encode(signature).decode()
         key_string=public.decode()
-        # print(key_string)
-        # print(data)
-        # print(signature_string)
         requests.post(f'http://{node}/data/new',json={'pubkey':key_string,'info':data,'govsig':signature_string})
         return signature
 
@@ -80,16 +70,16 @@ class Authority:
         return hash
 
 # Instantiate the Node
-app = Flask(__name__)           #Original
+app = Flask(__name__)
 
 # Generate a globally unique address for this node
-node_identifier = str(uuid4()).replace('-', '')         #Original
+node_identifier = str(uuid4()).replace('-', '')
 
-# Instantiate the Blockchain
-authority = Authority()           #Original
+# Instantiate the Node
+authority = Authority()
 
 @app.route('/hsign', methods=['POST'])
-def hash_and_sign():    #Sign image and hand in
+def hash_and_sign():
     values = request.get_json()
     required = ['image','govpri','user_pubkey','node']
     if not all(k in values for k in required):
@@ -98,7 +88,7 @@ def hash_and_sign():    #Sign image and hand in
     signature = authority.fsign(hash,values['govpri'],values['user_pubkey'],values['node'])
     return 'Signature done\n', 200
 
-if __name__ == '__main__':      #Original
+if __name__ == '__main__':
     from argparse import ArgumentParser
 
     parser = ArgumentParser()
