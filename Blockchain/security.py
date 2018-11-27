@@ -21,8 +21,6 @@ import base64
 
 from cryptography.exceptions import InvalidSignature
 
-import imagehash
-
 import sys
 import os
 import _thread
@@ -84,13 +82,13 @@ class Security:
             print('Target not found')
 
 # Instantiate the Node
-app = Flask(__name__)           #Original
+app = Flask(__name__)
 
 # Generate a globally unique address for this node
-node_identifier = str(uuid4()).replace('-', '')         #Original
+node_identifier = str(uuid4()).replace('-', '')
 
 # Instantiate the Blockchain
-security = Security()           #Original
+security = Security()
 
 @app.route('/data/verify',methods=['POST'])
 def retrieve_verify():
@@ -111,7 +109,7 @@ def retrieve_verify():
     elif res2==-1:
         return 'Target not found\n', 200
 
-if __name__ == '__main__':      #Original
+if __name__ == '__main__':
     from argparse import ArgumentParser
 
     parser = ArgumentParser()
