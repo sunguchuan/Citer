@@ -21,16 +21,13 @@ import base64
 
 from cryptography.exceptions import InvalidSignature
 
-import asyncio
-from kademlia.network import Server
-
 from random import random
 
 import _thread
 
 class Blockchain:
     def __init__(self):
-        self.current_data=[]    # Used to store the current ID information
+        self.current_data=[]
         self.chain = [
         {   "data":[],
             "index": 1,
@@ -46,7 +43,7 @@ class Blockchain:
             backend=default_backend()
         )
 
-    def register_node(self, address):   #Original
+    def register_node(self, address):
         """
         Add a new node to the list of nodes
         :param address: Address of node. Eg. 'http://192.168.0.5:5000'
@@ -70,26 +67,10 @@ class Blockchain:
     def return_node(self,node):
         requests.post(f'http://{node}/nodes/register_return',json={'node':request.host})
 
-    def register_node2(self,address):
-        """
-        Add a new node to the list of nodes through Kademlia
-        param address: Address of node. Eg. 'http://192.168.0.5:5000'
-        """
-        # parsed_url = urlparse(address)
-        # if parsed_url.netloc:
-        #     self.nodes.add(parsed_url.netloc)
-        # elif parsed_url.path:
-        #     # Accepts an URL without scheme like '192.168.0.5:5000'.
-        #     self.nodes.add(parsed_url.path)
-        # else:
-        #    raise ValueError('Invalid URL')
-        loop = asyncio.get_event_loop()
-        loop.run_until_complete(node.bootstrap([(address[0], address[1])]))
-
     def getneighbours(self):
         return node.bootstrappableNeighbors()
 
-    def valid_chain(self, chain):       #Original
+    def valid_chain(self, chain):
         """
         Determine if a given blockchain is valid
         :param chain: A blockchain
@@ -101,10 +82,6 @@ class Blockchain:
 
         while current_index < len(chain):
             block = chain[current_index]
-            # print(f'{last_block}')
-            # print(f'{block}')
-            # print("\n-----------\n")
-            # Check that the hash of the block is correct
             if block['previous_hash'] != self.hash(last_block):
                 print('invalid chain')
                 return False
@@ -116,7 +93,7 @@ class Blockchain:
             current_index += 1
         return True
 
-    def resolve_conflicts(self):        #Original
+    def resolve_conflicts(self):
         """
         This is our consensus algorithm, it resolves conflicts
         by replacing our chain with the longest one in the network.
@@ -131,9 +108,6 @@ class Blockchain:
 
         # Grab and verify the chains from all the nodes in our network
         for node in neighbours:
-            # res=requests.post(f'http://{node}/nodes/register',json={'nodes':["http://localhost:5000/"]})
-            # print(res.json())
-            # requests.get(f'http://{node}/mine')
             response = requests.get(f'http://{node}/chain')
 
             if response.status_code == 200:
@@ -282,108 +256,12 @@ class Blockchain:
         else:
             return True
 
-    # def verify(self,pubkey,sig,data):  # padding=PKCS1v15, hash=sha256
-    #     indata=self.getFileData(data)
-    #     signature=self.getFileData(sig)
-    #     keydata=self.getFileData(pubkey)
-    #
-    #     pub=serialization.load_pem_public_key(
-    #         keydata,
-    #         backend=default_backend()
-    #     )
-    #
-    #     res=False;
-    #     try:
-    #         pub.verify(signature,indata,padding.PKCS1v15(), hashes.SHA256())
-    #     except InvalidSignature:
-    #         print('invalid signature!')
-    #     else:
-    #         res=True
-    #     return res
-
-    # def authorization(self,index,target,pubkey):
-        # targetfs=open(target)
-        # targetData=targetfs.read()
-        # targetfs.close()
-        #
-        # pubkeyfs=open(pubkey)
-        # pubkeyData=pubkeyfs.read()
-        # pubkeyfs.close()
-        #
-        # for entry in self.chain[index-1]['data']:
-        #     if entry['public key']==targetData:
-        #         if pubkeyData not in entry['white list']:
-        #             for current_entry in self.current_data:
-        #                 if current_entry['public key'] == pubkeyData:
-        #                     if pubkeyData not in current_entry['white list']:
-        #                         current_entry['white list'].append(pubkeyData)
-        #                         return self.last_block['index']+1
-        #                     else:
-        #                         return 0
-        #             new_entry = copy.deepcopy(entry)     #public key not in currentd data
-        #             new_entry['white list'].append(pubkeyData)
-        #             self.current_data.append(new_entry)
-        #             return self.last_block['index']+1
-        #         else:
-        #             return 0
-        # return -1
-
-    # def retrieve(self, index, target, pubkey, resfile):
-    #     targetfs=open(target)
-    #     targetData=targetfs.read()
-    #     targetfs.close()
-    #
-    #     for entry in self.chain[index-1]['data']:
-    #         if entry['public key']==targetData:
-    #             pubkeyfs=open(pubkey)
-    #             pubkeyData=pubkeyfs.read()
-    #             pubkeyfs.close()
-    #
-    #             if pubkeyData in entry['white list']:
-    #                 pubkeyfs=open(pubkey,'rb')
-    #                 bytes=pubkeyfs.read()
-    #                 pubkeyfs.close()
-    #                 pub=serialization.load_pem_public_key(
-    #                     bytes,
-    #                     backend=default_backend()
-    #                 )
-    #                 res=pub.encrypt(
-    #                 (entry['info'].encode()),
-    #                 padding.PKCS1v15()
-    #                 )
-    #                 resfs=open(resfile,'wb')
-    #                 resfs.write(res)
-    #                 resfs.close()
-    #
-    #                 return 1
-    #             else:
-    #                 print ('Access denied')
-    #                 return -1
-    #     print ('Target not found')
-    #     return -1
-
-    # def check_image(self,index,pubkey,datafile):
-    #     # self.resolve_conflicts()
-    #
-    #     pubkeyfs=open(pubkey)
-    #     pubkeyData=pubkeyfs.read()
-    #     pubkeyfs.close()
-    #
-    #     imagefs=open(datafile)
-    #     imageData=imagefs.read()
-    #     imagefs.close()
-    #
-    #     for entry in self.chain[index-1]['data']:
-    #         if entry['public key']==pubkeyData and entry['info']==imageData:
-    #             return True
-    #     return False
-
     @property
-    def last_block(self):       #Original
+    def last_block(self):
         return self.chain[-1]
 
     @staticmethod
-    def hash(block):            #Original
+    def hash(block):
         """
         Creates a SHA-256 hash of a Block
         :param block: Block
@@ -393,13 +271,7 @@ class Blockchain:
         block_string = json.dumps(block, sort_keys=True).encode()
         return hashlib.sha256(block_string).hexdigest()
 
-    # @staticmethod
-    # def hash_transaction(transaction):
-    #     transaction_string = json.dumps(transaction, sort_keys=True).encode()
-    #     hash=hashlib.sha256(transaction_string).hexdigest()
-    #     return hash
-
-    def proof_of_work(self, last_block, data):        #Original
+    def proof_of_work(self, last_block, data):
         """
         Simple Proof of Work Algorithm:
          - Find a number p' such that hash(pp') contains leading 4 zeroes
@@ -442,11 +314,6 @@ class Blockchain:
         crypto=rsa.encrypt(content,pubkey)
         return crypto
 
-    # def decrypt(prikey,data):
-    #     content=rsa.decrypt(data,prikey)
-    #     con=content.decode('utf-8')
-    #     return con
-
     def getFileData(self,filename):
         input=open(filename,'rb')
         res=input.read()
@@ -454,35 +321,17 @@ class Blockchain:
         return res
 
 # Instantiate the Node
-app = Flask(__name__)           #Original
+app = Flask(__name__)
 
 # Generate a globally unique address for this node
-node_identifier = str(uuid4()).replace('-', '')         #Original
+node_identifier = str(uuid4()).replace('-', '')
 
 # Instantiate the Blockchain
-blockchain = Blockchain()           #Original
+blockchain = Blockchain() 
 
 
 @app.route('/mine', methods=['GET'])
 def mine():
-    # # We run the proof of work algorithm to get the next proof...
-    # last_block = blockchain.last_block
-    # proof = blockchain.proof_of_work(last_block)
-    #
-    # # We must receive a reward for finding the proof.
-    # # The sender is "0" to signify that this node has mined a new coin.
-    # '''
-    # blockchain.new_transaction(
-    #     sender="0",
-    #     recipient=node_identifier,
-    #     amount=1,
-    # )
-    # '''
-    # # Forge the new Block by adding it to the chain
-    #
-    # # blockchain.resolve_conflicts()
-    # previous_hash = blockchain.hash(last_block)
-    # block = blockchain.new_block(proof, previous_hash)
     block=blockchain.mine()
 
     response = {
@@ -533,38 +382,6 @@ def check_data():
     _thread.start_new_thread( blockchain.check_data, (values['pubkey'], values['info'],values['govsig'],) )
 
     return 'Message received', 201
-
-# @app.route('/data/authorize',methods=['POST'])
-# def author():
-#     values=request.get_json()
-#     required=['index','target','signature','data','pubkey']
-#     if not all(k in values for k in required):
-#         return 'Missing values', 400
-#
-#     if blockchain.verify(values['target'],values['signature'],values['data']) is False:
-#         return 'Signature verification fail\n', 400
-#     res = blockchain.authorization(values['index'],values['target'],values['pubkey'])
-#     if res==-1:
-#         return 'Target not found\n', 400
-#     elif res==0:
-#         return 'pubkey already authorized\n', 400
-#     else:
-#         response={'message':f'Authorization succeed. New data will be added to Block {res}'}
-#         return jsonify(response),201
-
-# @app.route('/data/retrieve',methods=['POST'])
-# def retrieve():
-#     values=request.get_json()
-#     required=['index','target','pubkey','resfile']
-#     if not all(k in values for k in required):
-#         return 'Missing values', 400
-#
-#     res=blockchain.retrieve(values['index'],values['target'],values['pubkey'],values['resfile'])
-#     if res == -1:
-#         return 'No data found or access denied\n', 400
-#     else:
-#         response={'message':f'Retrieve succeed'}
-#         return jsonify(response), 200
 
 @app.route('/chain', methods=['GET'])       #Original
 def full_chain():
@@ -633,14 +450,4 @@ if __name__ == '__main__':      #Original
     args = parser.parse_args()
     port = args.port
 
-    # node = Server()
-    # node.listen(port)
-    # loop = asyncio.get_event_loop()
-    # loop.run_until_complete(node.bootstrap([("0.0.0.0", port)]))
-
     app.run(host='0.0.0.0', port=port, threaded=True)
-    # print('Run the node')
-
-
-    # loop = asyncio.get_event_loop()
-    # loop.run_until_complete(node.bootstrap([("0.0.0.0", port)]))
