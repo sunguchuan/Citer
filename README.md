@@ -3,7 +3,7 @@ Source code of a Citer project
 
 # Requirements for python:
 Python 3.6
-
+Commands.txt
 Requests
 
 Flask
@@ -28,4 +28,4 @@ $./add_bio.sh
 # Step 3: Verification of one fingerprint
 In security_check
 
-See Commands.txt
+See cmd.txt
