@@ -1,5 +1,2 @@
-To create a security_check node:
-$python3 security.py -p 7000
-
 To make verification:
 curl -X POST -H "Content-Type:application/json" -d '{"node": "localhost:5002", "target": "pubkey2.pub", "original_image": "pic2.png", "collected_image":"pic2.png"}' "http://localhost:7000/data/verify"
