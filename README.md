@@ -15,4 +15,16 @@ curl
 
 powershell (for windows)
 
-# Registration
+# Test step 1: Create some miner nodes and register them to each other
+In miner/
+
+$./startup.sh {# of nodes that you want to create}
+
+# Step 2: Add a set of fingerprints hashes to the blockchain
+In authority/
+
+$./add_bio.sh
+
+# Step 3: Verification of one fingerprint
+In security_check
+See Commands.txt
