@@ -27,4 +27,5 @@ $./add_bio.sh
 
 # Step 3: Verification of one fingerprint
 In security_check
+
 See Commands.txt
