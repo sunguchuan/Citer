@@ -1,0 +1,11 @@
+# to setup
+python3 authority.py ./Pictures/pic3.bmp 0xC5B3fdb9B3119Fc680e8A992E080F7CDAa867d95
+
+# to authorize
+python3 user.py 0xCf39791740bDcaf5BA1dA282c3E5205fcC652246 0x8699c6B603735B661D58E51F5dA23744Be0Abe41 3000
+
+# to retrieve
+python3 security_check.py 0xCf39791740bDcaf5BA1dA282c3E5205fcC652246 QmWsLN4uLz8RzFVtdkrboYjZmw3Ni8zDRHWanAgk5X9x5M ./Verifier/collected.bmp
+
+# to revoke
+python3 authority.py 0xb347cceF51788b0c76d89CAAca992241149add41
